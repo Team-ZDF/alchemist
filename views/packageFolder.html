@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Alchemist - Package Folder</title>
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="text-center">
+      <i class="fa fa-gift"></i>&nbsp;Package Folder
+    </h1>
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2 col-lg-6 col-lg-offset-3">
+        <form id="packageForm">
+          <input type="hidden" id="sourceFolder" name="sourceFolder" />
+          <input type="hidden" id="encryptionKey" name="encryptionKey" />
+          <input type="hidden" id="verificationKey" name="verificationKey" />
+          <input type="hidden" id="destination" name="destination" />
+
+          <button type="button" class="btn btn-primary btn-lg btn-block" id="selectSourceFolderButton">
+            <i class="fa fa-folder-open-o"></i>&nbsp;Select Folder to Package
+          </button>
+
+          <button type="button" class="btn btn-primary btn-lg btn-block" id="selectDestinationButton">
+            <i class="fa fa-hdd-o"></i>&nbsp;Select Destination
+          </button>
+
+          <button type="button" class="btn btn-primary btn-lg btn-block" id="selectVerificationKeyButton">
+            <i class="fa fa-certificate"></i>&nbsp;Select Verification Key
+          </button>
+
+          <button type="button" class="btn btn-primary btn-lg btn-block" id="selectEncryptionKeyButton">
+            <i class="fa fa-lock"></i>&nbsp;Select Encryption Key
+          </button>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="saveButton">
+            <i class="fa fa-floppy-o"></i>&nbsp;Save
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var ipc = require('ipc');
+
+    (function() {
+      document.querySelector('#packageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var inputs = this.querySelectorAll('input[name],textarea[name],select[name]');
+        var form = {};
+        for (var i = 0; i < inputs.length; i++) {
+          var input = inputs[i];
+          form[input.name] = input.value;
+        }
+
+        ipc.send('save-package', form);
+      });
+
+      document.querySelector('#selectSourceFolderButton').addEventListener('click', function() {
+        ipc.send('select-folder', {
+          key: 'sourceFolder'
+        });
+      });
+
+      document.querySelector('#selectDestinationButton').addEventListener('click', function() {
+        ipc.send('select-file', {
+          key: 'destination',
+          filters: [{
+            name: 'ZDF',
+            extensions: ['zdf']
+          }]
+        });
+      });
+
+      ipc.on('folder-selected', function(folder, options) {
+        var button;
+        switch (options.key) {
+          case 'sourceFolder':
+            document.querySelector('#sourceFolder').value = folder;
+            button = document.querySelector('#selectSourceFolderButton');
+            break;
+        }
+
+        if (button) {
+          button.classList.toggle('btn-success', !!folder);
+        }
+      });
+
+      ipc.on('file-selected', function(file, options) {
+        var button;
+        switch (options.key) {
+          case 'destination':
+            document.querySelector('#destination').value = file;
+            button = document.querySelector('#selectDestinationButton');
+            break;
+          case 'encryptionKey':
+            document.querySelector('#encryptionKey').value = file;
+            button = document.querySelector('#selectEncryptionKeyButton');
+            break;
+          case 'verificationKey':
+            document.querySelector('#verificationKey').value = file;
+            button = document.querySelector('#selectVerificationKeyButton');
+            break;
+        }
+
+        if (button) {
+          button.classList.toggle('btn-success', !!file);
+        }
+      });
+
+      ipc.on('save-complete', function() {
+        document.querySelector('#packageForm').reset();
+        var buttons = document.querySelectorAll('.btn-success');
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].classList.remove('btn-success');
+        }
+      });
+    })();
+  </script>
+</body>
+
+</html>
