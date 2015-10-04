@@ -32,6 +32,11 @@
             <i class="fa fa-certificate"></i>&nbsp;Select Verification Key
           </button>
 
+          <div class="form-group">
+            <label>Verification Key Passphrase</label>
+            <input type="password" name="verificationKeyPassphrase" class="form-control" />
+          </div>
+
           <button type="button" class="btn btn-primary btn-lg btn-block" id="selectEncryptionKeyButton">
             <i class="fa fa-lock"></i>&nbsp;Select Encryption Key
           </button>
@@ -73,6 +78,18 @@
             name: 'ZDF',
             extensions: ['zdf']
           }]
+        });
+      });
+
+      document.querySelector('#selectEncryptionKeyButton').addEventListener('click', function() {
+        ipc.send('select-file', {
+          key: 'encryptionKey'
+        });
+      });
+
+      document.querySelector('#selectVerificationKeyButton').addEventListener('click', function() {
+        ipc.send('select-file', {
+          key: 'verificationKey'
         });
       });
 

@@ -68,33 +68,41 @@ ipc.on('package-folder', function(event, arg) {
   });
 });
 
-ipc.on('save-package', function(event, options) {
+ipc.on('save-package', (event, options) => {
   console.log('Packaging', options);
-  save.save(options.sourceFolder, options.destination, function() {
+  save.save({
+    source: options.sourceFolder,
+    destination: options.destination,
+    publicKey: options.encryptionKey,
+    privateKey: options.verificationKey,
+    privateKeyPassphrase: options.verificationKeyPassphrase,
+  }).then(() => {
     console.log('Finished');
     shell.showItemInFolder(options.sourceFolder.toString());
     event.sender.send('save-complete');
+  }).catch((e) => {
+    console.error(e);
   });
 });
 
-ipc.on('select-file', function(event, options) {
+ipc.on('select-file', (event, options) => {
   if (!options) {
     options = {};
   }
 
   dialog.showSaveDialog({
     filters: options.filters
-  }, function(destination) {
+  }, (destination) => {
     if (destination) {
       event.sender.send('file-selected', destination, options);
     }
   });
 });
 
-ipc.on('select-folder', function(event, options) {
+ipc.on('select-folder', (event, options) => {
   dialog.showOpenDialog({
     properties: ['openDirectory']
-  }, function(directory) {
+  }, (directory) => {
     if (directory) {
       event.sender.send('folder-selected', directory, options);
     }
