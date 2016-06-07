@@ -50,7 +50,7 @@
   </div>
 
   <script>
-    var ipc = require('ipc');
+    const {ipcRenderer} = require('electron');
 
     (function() {
       document.querySelector('#packageForm').addEventListener('submit', function(e) {
@@ -62,17 +62,17 @@
           form[input.name] = input.value;
         }
 
-        ipc.send('save-package', form);
+        ipcRenderer.send('save-package', form);
       });
 
       document.querySelector('#selectSourceFolderButton').addEventListener('click', function() {
-        ipc.send('select-folder', {
+        ipcRenderer.send('select-folder', {
           key: 'sourceFolder'
         });
       });
 
       document.querySelector('#selectDestinationButton').addEventListener('click', function() {
-        ipc.send('select-file', {
+        ipcRenderer.send('select-file', {
           key: 'destination',
           filters: [{
             name: 'ZDF',
@@ -82,18 +82,18 @@
       });
 
       document.querySelector('#selectEncryptionKeyButton').addEventListener('click', function() {
-        ipc.send('select-file', {
+        ipcRenderer.send('select-file', {
           key: 'encryptionKey'
         });
       });
 
       document.querySelector('#selectVerificationKeyButton').addEventListener('click', function() {
-        ipc.send('select-file', {
+        ipcRenderer.send('select-file', {
           key: 'verificationKey'
         });
       });
 
-      ipc.on('folder-selected', function(folder, options) {
+      ipcRenderer.on('folder-selected', function(folder, options) {
         var button;
         switch (options.key) {
           case 'sourceFolder':
@@ -107,7 +107,7 @@
         }
       });
 
-      ipc.on('file-selected', function(file, options) {
+      ipcRenderer.on('file-selected', function(file, options) {
         var button;
         switch (options.key) {
           case 'destination':
@@ -129,7 +129,7 @@
         }
       });
 
-      ipc.on('save-complete', function() {
+      ipcRenderer.on('save-complete', function() {
         document.querySelector('#packageForm').reset();
         var buttons = document.querySelectorAll('.btn-success');
         for (var i = 0; i < buttons.length; i++) {

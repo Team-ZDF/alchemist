@@ -1,16 +1,16 @@
-var app = require('app'); // Module to control application life.
-var BrowserWindow = require('browser-window'); // Module to create native browser window.
-var dialog = require('dialog');
-var ipc = require('ipc');
-var save = require('./lib/save.js');
-var shell = require('shell');
+const electron = require('electron');
+const save = require('./lib/save.js');
+
+// Module to control application life.
+// Module to create native browser window.
+const {app, BrowserWindow, dialog, ipcMain, shell} = electron;
 
 // Report crashes to our server.
 //require('crash-reporter').start();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
-var mainWindow = null;
+let mainWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -31,7 +31,7 @@ app.on('ready', function() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/views/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/views/index.html');
 
   // Open the devtools.
   //mainWindow.openDevTools();
@@ -45,7 +45,7 @@ app.on('ready', function() {
   });
 });
 
-ipc.on('package-folder', function(event, arg) {
+ipcMain.on('package-folder', function() {
   dialog.showOpenDialog({
     properties: ['openDirectory']
   }, function(directory) {
@@ -68,14 +68,14 @@ ipc.on('package-folder', function(event, arg) {
   });
 });
 
-ipc.on('save-package', (event, options) => {
+ipcMain.on('save-package', (event, options) => {
   console.log('Packaging', options);
   save.save({
     source: options.sourceFolder,
     destination: options.destination,
     publicKey: options.encryptionKey,
     privateKey: options.verificationKey,
-    privateKeyPassphrase: options.verificationKeyPassphrase,
+    privateKeyPassphrase: options.verificationKeyPassphrase
   }).then(() => {
     console.log('Finished');
     shell.showItemInFolder(options.sourceFolder.toString());
@@ -85,7 +85,7 @@ ipc.on('save-package', (event, options) => {
   });
 });
 
-ipc.on('select-file', (event, options) => {
+ipcMain.on('select-file', (event, options) => {
   if (!options) {
     options = {};
   }
@@ -99,7 +99,7 @@ ipc.on('select-file', (event, options) => {
   });
 });
 
-ipc.on('select-folder', (event, options) => {
+ipcMain.on('select-folder', (event, options) => {
   dialog.showOpenDialog({
     properties: ['openDirectory']
   }, (directory) => {
