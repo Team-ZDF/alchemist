@@ -13,13 +13,9 @@
   "author": "Tyler Benfield <rtbenfield@gmail.com> (http://tylerbenfield.me/)",
   "license": "MIT",
   "repository": "team-zdf/alchemist",
-  "devDependencies": {
-    "electron-prebuilt": "^1.2.1",
-    "grunt": "^1.0.1",
-    "grunt-exec": "^0.4.7"
-  },
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "electron-prebuilt": "^1.2.1",
     "font-awesome": "^4.6.3",
     "fstream": "^1.0.9",
     "jquery": "^2.2.4"
